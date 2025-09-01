@@ -1,11 +1,11 @@
 'use client';
-
+import Image from 'next/image';
 import { useState } from 'react';
 import { UploadDialog } from './components/upload-dialog';
 import { SearchBar } from './components/search-bar';
 import { ImageGrid } from './components/image-grid';
-import { Toaster } from '@/components/ui/sonner';
-import { ImageIcon, Search, Upload } from 'lucide-react';
+import { Sparkles, Zap } from 'lucide-react';
+import NextImage from 'next/image';
 
 export default function Home() {
   const [searchTags, setSearchTags] = useState<string[]>([]);
@@ -16,80 +16,173 @@ export default function Home() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-slate-50 overflow-hidden">
-      <Toaster />
-
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/50">
       {/* Header */}
-      <header className="flex-none bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-blue-600 rounded-lg">
-            <ImageIcon className="h-6 w-6 text-white" />
+      <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-lg border-b border-slate-200/60 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl blur-lg opacity-20"></div>
+                <div className="relative p-3 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl shadow-lg">
+                  {/* solo logo SkillPower */}
+                  <NextImage
+                    src="/SkillPower.svg"
+                    alt="SkillPower Logo"
+                    width={28}
+                    height={28}
+                    className="h-7 w-7"
+                  />
+                </div>
+              </div>
+              <div>
+                <h1 className="text-2xl lg:text-3xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                  SkillPower Gallery
+                </h1>
+                <p className="text-sm text-slate-500 hidden sm:block">
+                  Gestione intelligente delle tue immagini
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3">
+              <div className="hidden md:flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200 rounded-xl">
+                <Sparkles className="h-4 w-4 text-emerald-600" />
+                <span className="text-sm font-medium text-emerald-700">
+                  100x100px Perfect
+                </span>
+              </div>
+              <UploadDialog onUploadComplete={handleUploadComplete} />
+            </div>
           </div>
-          <h1 className="text-xl md:text-2xl font-bold text-slate-800">Gestione Immagini</h1>
         </div>
-        <UploadDialog onUploadComplete={handleUploadComplete} />
       </header>
 
       {/* Main content */}
-      <main className="flex-1 flex flex-col overflow-hidden px-4 py-2 space-y-2">
-        {/* Hero */}
-        <div className="flex-none text-center">
-          <h2 className="text-xl md:text-3xl font-bold text-slate-800 mb-1">SkillPower - Organizza le tue Immagini</h2>
-          <p className="text-xs md:text-sm text-slate-600">
-            Carica, organizza e scarica le tue immagini con facilità. Cerca per tag, converti in diversi formati e scegli la dimensione perfetta.
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+        {/* Hero Section compatta */}
+        <div className="text-center space-y-4 max-w-4xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-100 to-indigo-100 border border-blue-200 rounded-full text-sm font-medium text-blue-800">
+            <Zap className="h-4 w-4" />
+            Organizza • Cerca • Converti
+          </div>
+          <h2 className="text-3xl lg:text-4xl font-bold text-slate-800 leading-tight">
+            Le tue immagini,{' '}
+            <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+              organizzate perfettamente
+            </span>
+          </h2>
+          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+            Carica, organizza e scarica le tue immagini con facilità. Ricerca intelligente per tag, 
+            conversione in diversi formati e dimensioni personalizzate.
           </p>
         </div>
 
-        {/* Search + Image Grid container */}
-        <div className="flex-1 flex flex-col overflow-hidden space-y-2">
-          {/* Search */}
-          <div className="flex-none bg-white rounded-lg shadow-sm border border-slate-200 p-2 md:p-4">
-            <div className="flex items-center gap-2 mb-1">
-              <Search className="h-4 w-4 text-slate-600"/>
-              <h3 className="text-sm md:text-base font-semibold text-slate-800">Cerca Immagini</h3>
+        {/* Search Section */}
+        <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-lg border border-white/50 overflow-hidden">
+          <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-gray-50">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg">
+                <Image className="h-5 w-5 text-white" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-slate-800">Ricerca Immagini</h3>
+                <p className="text-sm text-slate-500">Filtra per tag e trova quello che cerchi</p>
+              </div>
             </div>
-            <SearchBar onSearch={setSearchTags} searchTags={searchTags}/>
           </div>
-
-          {/* Images grid */}
-          <div className="flex-1 bg-white rounded-lg shadow-sm border border-slate-200 p-2 md:p-4 overflow-auto">
-            <div className="flex justify-between items-center mb-2">
-              <h3 className="text-sm md:text-base font-semibold text-slate-800">
-                {searchTags.length>0 ? 'Risultati della ricerca' : 'Tutte le immagini'}
-              </h3>
-              <span className="text-xs text-slate-500">
-                {searchTags.length>0 && `Filtrato per: ${searchTags.join(', ')}`}
-              </span>
-            </div>
-            <div className="h-full">
-              <ImageGrid searchTags={searchTags} refreshTrigger={refreshTrigger}/>
-            </div>
+          
+          <div className="p-0">
+            <SearchBar onSearch={setSearchTags} searchTags={searchTags}/>
           </div>
         </div>
 
-        {/* Features info */}
-        <div className="flex-none grid grid-cols-1 md:grid-cols-3 gap-2 md:gap-4 text-center">
-          <div className="bg-blue-50 rounded-lg p-2 md:p-4">
-            <Upload className="h-8 w-8 text-blue-600 mx-auto mb-1"/>
-            <h4 className="text-sm md:text-base font-semibold text-slate-800 mb-1">Upload Facile</h4>
-            <p className="text-xs md:text-sm text-slate-600">Trascina o seleziona file fino a 10MB</p>
+        {/* Images Grid Section */}
+        <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-lg border border-white/50 overflow-hidden">
+          <div className="p-6 border-b border-slate-100 bg-gradient-to-r from-slate-50 to-gray-50">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-gradient-to-r from-emerald-500 to-teal-600 rounded-lg">
+                  <Image className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-slate-800">
+                    {searchTags.length > 0 ? 'Risultati della ricerca' : 'La tua collezione'}
+                  </h3>
+                  <p className="text-sm text-slate-500">
+                    {searchTags.length > 0 
+                      ? `Filtrato per: ${searchTags.join(', ')}` 
+                      : 'Tutte le tue immagini organizzate'
+                    }
+                  </p>
+                </div>
+              </div>
+              
+              {searchTags.length > 0 && (
+                <div className="flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-blue-100 to-indigo-100 border border-blue-200 rounded-full">
+                  <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-medium text-blue-700">
+                    {searchTags.length} filtri attivi
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
-          <div className="bg-emerald-50 rounded-lg p-2 md:p-4">
-            <Search className="h-8 w-8 text-emerald-600 mx-auto mb-1"/>
-            <h4 className="text-sm md:text-base font-semibold text-slate-800 mb-1">Ricerca Intelligente</h4>
-            <p className="text-xs md:text-sm text-slate-600">Trova immagini rapidamente tramite tag</p>
+          
+          <div className="min-h-[60vh]">
+            <ImageGrid searchTags={searchTags} refreshTrigger={refreshTrigger}/>
           </div>
-          <div className="bg-amber-50 rounded-lg p-2 md:p-4">
-            <ImageIcon className="h-8 w-8 text-amber-600 mx-auto mb-1"/>
-            <h4 className="text-sm md:text-base font-semibold text-slate-800 mb-1">Conversione Avanzata</h4>
-            <p className="text-xs md:text-sm text-slate-600">Scarica PNG, BMP, ICO o SVG in varie dimensioni</p>
+        </div>
+
+        {/* Stats/Info bar compatta */}
+        <div className="bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 rounded-2xl p-6 text-white shadow-2xl">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+            <div className="text-center md:text-left">
+              <h4 className="text-xl font-bold mb-1">Gestione Professionale</h4>
+              <p className="text-slate-300">Upload sicuro • Ricerca intelligente • Conversione avanzata</p>
+            </div>
+            
+            <div className="flex items-center gap-8 text-center">
+              <div>
+                <div className="text-2xl font-bold text-blue-400">100x100</div>
+                <div className="text-xs text-slate-400 uppercase tracking-wide">Formato Ottimale</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-emerald-400">PNG/ICO</div>
+                <div className="text-xs text-slate-400 uppercase tracking-wide">Multi Formato</div>
+              </div>
+              <div>
+                <div className="text-2xl font-bold text-amber-400">16-512px</div>
+                <div className="text-xs text-slate-400 uppercase tracking-wide">Dimensioni Flessibili</div>
+              </div>
+            </div>
           </div>
         </div>
       </main>
 
-      {/* Footer */}
-      <footer className="flex-none bg-white border-t border-slate-200 py-2 text-center text-xs md:text-sm text-slate-600">
-        © 2024 Gestione Immagini. Applicazione sviluppata con Next.js e Sharp.
+      <footer className="mt-16 bg-white border-t border-slate-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-1.5 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg">
+                {/* solo logo SkillPower */}
+                <NextImage
+                  src="/SkillPower.svg"
+                  alt="SkillPower Logo"
+                  width={16}
+                  height={16}
+                  className="h-4 w-4"
+                />
+              </div>
+              <span className="text-sm text-slate-600">SkillPower Gallery</span>
+            </div>
+            <div className="text-center md:text-right">
+              <p className="text-sm text-slate-500">
+                © 2024 Gestione Immagini • Sviluppato con Next.js e Sharp
+              </p>
+            </div>
+          </div>
+        </div>
       </footer>
     </div>
   );

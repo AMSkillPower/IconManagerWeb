@@ -64,3 +64,27 @@ export async function GET(request: NextRequest) {
     return new NextResponse('Errore durante il download', { status: 500 });
   }
 }
+
+export async function POST(req: NextRequest) {
+  try {
+    const formData = await req.formData();
+    const file = formData.get('image') as File; // <-- ora coincide con frontend
+
+    if (!file) {
+      return NextResponse.json({ error: 'Nessun file inviato' }, { status: 400 });
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    await ImageDatabase.save({
+      buffer,
+      originalName: file.name,
+    });
+
+    return NextResponse.json({ success: true, message: 'Upload completato' });
+  } catch (err) {
+    console.error('Upload error:', err);
+    return NextResponse.json({ error: 'Errore durante l\'upload' }, { status: 500 });
+  }
+}
