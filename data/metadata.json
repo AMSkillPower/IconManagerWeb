@@ -1,0 +1,52 @@
+[
+  {
+    "filename": "SkillPower.png",
+    "originalName": "SkillPower.png",
+    "size": 10157,
+    "mimetype": "image/png",
+    "tags": [
+      "SkillPower",
+      "Logo",
+      "Logo SKPW"
+    ],
+    "uploadDate": "2025-07-09T09:34:12.193Z",
+    "buffer": {
+      "type": "Buffer",
+      "data": []
+    },
+    "id": "img_1752053652193_tgha7w7"
+  },
+  {
+    "filename": "XDManager.png",
+    "originalName": "XDManager.png",
+    "size": 43720,
+    "mimetype": "image/png",
+    "tags": [
+      "XDManager",
+      "XDM",
+      "Trasgerimento"
+    ],
+    "uploadDate": "2025-07-15T08:16:59.829Z",
+    "buffer": {
+      "type": "Buffer",
+      "data": []
+    },
+    "id": "img_1752567419830_zvmkles"
+  },
+  {
+    "filename": "ADWizad_100x100.png",
+    "originalName": "ADWizad_100x100.png",
+    "size": 8939,
+    "mimetype": "image/png",
+    "tags": [
+      "SkillPower",
+      "ADWizard"
+    ],
+    "uploadDate": "2025-08-29T07:59:06.060Z",
+    "buffer": {
+      "type": "Buffer",
+      "data": []
+    },
+    "id": "img_1756454346060_2zd0bkp"
+  }
+]
