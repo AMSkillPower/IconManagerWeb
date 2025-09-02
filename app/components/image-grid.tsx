@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Download, Eye, Clock, FileImage } from 'lucide-react';
+import { Download, Eye, Clock, FileImage, Image as ImageIcon } from 'lucide-react';
 
 interface ImageItem {
   id: string;
@@ -82,168 +81,211 @@ export function ImageGrid({ searchTags, refreshTrigger }: ImageGridProps) {
         document.body.appendChild(a);
         a.click();
         a.remove();
-        console.log('Download iniziato!');
       } else console.error('Errore durante il download');
     } catch {
       console.error('Errore durante il download');
     }
   };
 
-  const formatDate = (d: string) => new Date(d).toLocaleDateString('it-IT', { year:'numeric',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit' });
-  const formatFileSize = (b: number) => b===0?'0 B':`${(b/1024**Math.floor(Math.log(b)/Math.log(1024))).toFixed(2)} ${['B','KB','MB','GB'][Math.floor(Math.log(b)/Math.log(1024))]}`;
+  const formatDate = (d: string) => new Date(d).toLocaleDateString('it-IT', { 
+    year:'numeric', month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' 
+  });
+  
+  const formatFileSize = (b: number) => {
+    if (b === 0) return '0 B';
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(b) / Math.log(k));
+    return `${(b / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`;
+  };
 
   if (loading) return (
-    <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 2xl:grid-cols-14 gap-3 p-4">
-      {[...Array(24)].map((_,i)=>(
-        <div key={i} className="animate-pulse bg-gray-200 aspect-square rounded-xl" />
-      ))}
+    <div className="h-full p-6">
+      <div className="grid-responsive h-full">
+        {[...Array(20)].map((_, i) => (
+          <div key={i} className="animate-pulse bg-blue-100/50 aspect-square rounded-2xl" />
+        ))}
+      </div>
     </div>
   );
 
-  if (images.length===0) return (
-    <div className="flex flex-col items-center justify-center py-16 text-gray-500 bg-gradient-to-br from-gray-50 to-gray-100 rounded-2xl mx-4 my-8">
-      <div className="bg-white p-4 rounded-full shadow-lg mb-4">
-        <FileImage className="h-12 w-12 text-gray-400"/>
+  if (images.length === 0) return (
+    <div className="h-full flex items-center justify-center p-6">
+      <div className="text-center space-y-4 max-w-sm">
+        <div className="mx-auto w-20 h-20 bg-gradient-to-r from-blue-100 to-blue-200 rounded-3xl flex items-center justify-center animate-float">
+          <FileImage className="h-10 w-10 text-blue-500"/>
+        </div>
+        <div>
+          <h3 className="text-xl font-semibold text-slate-700 mb-2">Nessuna immagine</h3>
+          <p className="text-slate-500">
+            {searchTags.length > 0 ? 'Modifica i filtri di ricerca' : 'Carica la prima immagine'}
+          </p>
+        </div>
       </div>
-      <h3 className="text-xl font-semibold mb-2 text-gray-700">Nessuna immagine trovata</h3>
-      <p className="text-gray-500">{searchTags.length>0?'Modifica i criteri di ricerca':'Carica la prima immagine'}</p>
     </div>
   );
 
   return (
-    <div className="space-y-6 p-4">
-      {/* Download rapido - Design migliorato */}
-      <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-100 rounded-xl shadow-sm">
-        <div className="flex items-center gap-2">
-          <Download className="h-5 w-5 text-blue-600" />
-          <span className="text-sm font-semibold text-blue-900">Download rapido:</span>
+    <div className="h-full flex flex-col">
+      {/* Download rapido header */}
+      <div className="p-4 border-b border-blue-100/50 bg-white/40 backdrop-blur-sm">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <Download className="h-4 w-4 text-blue-600" />
+            <span className="text-sm font-medium text-slate-700">Download rapido:</span>
+          </div>
+          <Select value={quickDownloadFormat} onValueChange={setQuickDownloadFormat}>
+            <SelectTrigger className="w-24 h-8 bg-white/80 border-blue-200/50 rounded-lg text-sm">
+              <SelectValue/>
+            </SelectTrigger>
+            <SelectContent>
+              {formats.map(f => <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </div>
-        <Select value={quickDownloadFormat} onValueChange={setQuickDownloadFormat}>
-          <SelectTrigger className="w-28 bg-white border-blue-200 focus:ring-2 focus:ring-blue-400 rounded-lg shadow-sm">
-            <SelectValue/>
-          </SelectTrigger>
-          <SelectContent>
-            {formats.map(f=><SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>)}
-          </SelectContent>
-        </Select>
       </div>
 
-      {/* Griglia immagini compatta e moderna */}
-      <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 lg:grid-cols-10 xl:grid-cols-12 2xl:grid-cols-14 gap-3 max-h-[70vh] overflow-auto">
-        {images.map(img => (
-          <div key={img.id} className="group relative">
-            <div className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 transform hover:scale-105">
-              <img
-                src={`/api/images/${img.id}`}
-                alt={img.originalName}
-                className="w-full aspect-square object-cover"
-              />
-              
-              {/* Overlay con pulsanti */}
-              <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-0 group-hover:bg-opacity-60 transition-all duration-300">
-                <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm rounded-lg h-8 w-8 p-0" 
-                    onClick={()=>setSelectedImage(img)}
-                  >
-                    <Eye className="h-4 w-4"/>
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="ghost" 
-                    className="bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm rounded-lg h-8 w-8 p-0" 
-                    onClick={()=>handleDownload(img.id,img.originalName)}
-                  >
-                    <Download className="h-4 w-4"/>
-                  </Button>
+      {/* Griglia immagini */}
+      <div className="flex-1 overflow-auto p-6">
+        <div className="grid-responsive">
+          {images.map(img => (
+            <div key={img.id} className="group relative">
+              <div className="bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 hover-lift border border-blue-100/30">
+                <div className="relative aspect-square">
+                  <img
+                    src={`/api/images/${img.id}`}
+                    alt={img.originalName}
+                    className="w-full h-full object-cover"
+                  />
+                  
+                  {/* Overlay con pulsanti */}
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <div className="flex gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="bg-white/90 hover:bg-white text-slate-700 backdrop-blur-sm rounded-xl h-8 w-8 p-0 shadow-lg" 
+                        onClick={() => setSelectedImage(img)}
+                      >
+                        <Eye className="h-4 w-4"/>
+                      </Button>
+                      <Button 
+                        size="sm" 
+                        variant="ghost" 
+                        className="bg-white/90 hover:bg-white text-slate-700 backdrop-blur-sm rounded-xl h-8 w-8 p-0 shadow-lg" 
+                        onClick={() => handleDownload(img.id, img.originalName)}
+                      >
+                        <Download className="h-4 w-4"/>
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Tags compatti */}
+                <div className="p-2">
+                  <div className="flex flex-wrap gap-1 justify-center">
+                    {img.tags.slice(0, 1).map((tag, i) => (
+                      <Badge 
+                        key={i} 
+                        variant="secondary" 
+                        className="text-xs px-2 py-0.5 bg-blue-50 text-blue-700 border-blue-200/50 rounded-full"
+                      >
+                        {tag}
+                      </Badge>
+                    ))}
+                    {img.tags.length > 1 && (
+                      <Badge 
+                        variant="outline" 
+                        className="text-xs px-2 py-0.5 rounded-full border-blue-200/50 text-blue-600"
+                      >
+                        +{img.tags.length - 1}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
-            
-            {/* Tags sotto l'immagine - più compatti */}
-            <div className="mt-2 flex flex-wrap gap-1 justify-center">
-              {img.tags.slice(0,1).map((tag,i)=>(
-                <Badge key={i} variant="secondary" className="text-xs px-2 py-0.5 bg-gray-100 text-gray-700 rounded-full">{tag}</Badge>
-              ))}
-              {img.tags.length > 1 && (
-                <Badge variant="outline" className="text-xs px-2 py-0.5 rounded-full border-gray-300">+{img.tags.length-1}</Badge>
-              )}
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
-      {/* Dialog info migliorato */}
-      <Dialog open={!!selectedImage} onOpenChange={(open)=>{if(!open) setSelectedImage(null)}}>
-        <DialogContent className="max-w-md sm:max-w-lg p-6 rounded-2xl shadow-2xl bg-gradient-to-br from-white to-gray-50">
-          <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-gray-800 mb-4">{selectedImage?.originalName}</DialogTitle>
+      {/* Dialog dettagli */}
+      <Dialog open={!!selectedImage} onOpenChange={(open) => {if(!open) setSelectedImage(null)}}>
+        <DialogContent className="max-w-lg p-0 rounded-3xl shadow-2xl bg-white border-blue-200/50 overflow-hidden">
+          <DialogHeader className="p-6 pb-4 bg-gradient-to-r from-blue-50 to-blue-100/50 border-b border-blue-200/30">
+            <DialogTitle className="text-xl font-semibold text-slate-800">
+              {selectedImage?.originalName}
+            </DialogTitle>
           </DialogHeader>
+          
           {selectedImage && (
-            <div className="space-y-6">
+            <div className="p-6 space-y-6">
               <div className="relative">
                 <img 
                   src={`/api/images/${selectedImage.id}`} 
                   alt={selectedImage.originalName} 
-                  className="w-full object-contain rounded-xl shadow-md bg-gray-50"
+                  className="w-full max-w-xs mx-auto object-contain rounded-2xl shadow-lg bg-gradient-to-br from-blue-50 to-white border border-blue-100/50"
                 />
               </div>
               
-              <div className="bg-white p-4 rounded-xl shadow-sm space-y-3">
+              <div className="bg-gradient-to-r from-blue-50/50 to-white rounded-2xl p-4 space-y-4 border border-blue-100/30">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <span className="font-semibold text-gray-700">Dimensione:</span>
-                    <p className="text-gray-600">{formatFileSize(selectedImage.size)}</p>
+                    <span className="font-medium text-slate-600">Dimensione:</span>
+                    <p className="text-slate-800">{formatFileSize(selectedImage.size)}</p>
                   </div>
                   <div>
-                    <span className="font-semibold text-gray-700">Tipo:</span>
-                    <p className="text-gray-600">{selectedImage.mimetype}</p>
+                    <span className="font-medium text-slate-600">Tipo:</span>
+                    <p className="text-slate-800">{selectedImage.mimetype}</p>
                   </div>
                 </div>
                 
                 <div>
-                  <span className="font-semibold text-gray-700">Upload:</span>
-                  <p className="text-gray-600 flex items-center gap-1">
-                    <Clock className="h-3 w-3" />
+                  <span className="font-medium text-slate-600">Upload:</span>
+                  <p className="text-slate-800 flex items-center gap-2">
+                    <Clock className="h-3 w-3 text-blue-500" />
                     {formatDate(selectedImage.uploadDate)}
                   </p>
                 </div>
                 
                 <div>
-                  <span className="font-semibold text-gray-700 mb-2 block">Tags:</span>
+                  <span className="font-medium text-slate-600 mb-2 block">Tags:</span>
                   <div className="flex flex-wrap gap-2">
-                    {selectedImage.tags.map((t,i)=>(
-                      <Badge key={i} className="bg-blue-100 text-blue-800 hover:bg-blue-200 rounded-full">{t}</Badge>
+                    {selectedImage.tags.map((t, i) => (
+                      <Badge 
+                        key={i} 
+                        className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-full"
+                      >
+                        {t}
+                      </Badge>
                     ))}
                   </div>
                 </div>
               </div>
               
-              {/* Sezione download avanzata */}
-              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-xl border border-blue-100">
-                <h4 className="font-semibold text-blue-900 mb-3">Download personalizzato</h4>
+              {/* Download personalizzato */}
+              <div className="bg-gradient-to-r from-blue-50 to-blue-100/50 p-4 rounded-2xl border border-blue-200/30">
+                <h4 className="font-medium text-slate-800 mb-3">Download personalizzato</h4>
                 <div className="flex gap-3">
                   <Select value={downloadFormat} onValueChange={setDownloadFormat}>
-                    <SelectTrigger className="flex-1 bg-white">
+                    <SelectTrigger className="flex-1 bg-white/80 border-blue-200/50 rounded-xl">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {formats.map(f=><SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>)}
+                      {formats.map(f => <SelectItem key={f.value} value={f.value}>{f.label}</SelectItem>)}
                     </SelectContent>
                   </Select>
                   <Select value={downloadSize} onValueChange={setDownloadSize}>
-                    <SelectTrigger className="flex-1 bg-white">
+                    <SelectTrigger className="flex-1 bg-white/80 border-blue-200/50 rounded-xl">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      {sizes.map(s=><SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
+                      {sizes.map(s => <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>)}
                     </SelectContent>
                   </Select>
                   <Button 
-                    onClick={()=>handleDownload(selectedImage.id, selectedImage.originalName, downloadFormat, downloadSize)}
-                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg"
+                    onClick={() => handleDownload(selectedImage.id, selectedImage.originalName, downloadFormat, downloadSize)}
+                    className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white rounded-xl shadow-lg"
                   >
                     <Download className="h-4 w-4 mr-1"/>
                     Scarica
